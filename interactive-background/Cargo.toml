@@ -1,0 +1,18 @@
+[package]
+name = "interactive-background"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { version = "0.14.1", features = ["dynamic_linking"] }
+
+[profile.dev]
+opt-level = 1
+
+[profile.wasm-release]
+inherits = "release"
+opt-level = "s"
+strip = "debuginfo"
+
+[profile.dev.package."*"]
+opt-level = 3
