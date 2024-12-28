@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 use core::f32::consts::PI;
 
-use crate::interaction_plugin::UserData;
+use crate::interaction_plugin::resources::UserData;
+use crate::smooth_moving_plugin::SmoothMove;
 
 use super::Rotation;
 
@@ -19,9 +20,9 @@ pub fn update_angles(mut _commands: Commands, mut query: Query<&mut Rotation>, t
 pub fn update_transforms(
     mut _commands: Commands,
     user_data: Res<UserData>,
-    mut query: Query<(Entity, &Rotation, &mut Transform)>,
+    mut query: Query<(Entity, &Rotation, &mut SmoothMove)>,
 ) {
-    for (entity, rotation, mut transform) in query.iter_mut() {
+    for (entity, rotation, mut smooth) in query.iter_mut() {
         if user_data
             .selected_ent
             .is_some_and(|selected_ent| selected_ent == entity)
@@ -34,7 +35,7 @@ pub fn update_transforms(
             Transform::from_rotation(Quat::from_euler(EulerRot::YZX, angle, 0.0, 0.0))
                 * Transform::from_xyz(0.0, 0.0, rotation.distance);
 
-        *transform = new_transform;
+        smooth.target_transform = new_transform;
     }
 }
 

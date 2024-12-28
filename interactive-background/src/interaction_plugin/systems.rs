@@ -5,9 +5,8 @@ use bevy::math::bounding::{BoundingVolume, RayCast3d};
 use bevy::math::prelude::InfinitePlane3d;
 use bevy::prelude::*;
 
+use super::resources::{CastRayEvent, UnlockObject, UserData};
 use super::Aabb;
-use super::CastRayEvent;
-use super::UserData;
 
 fn cast_ray(
     trigger: Trigger<CastRayEvent>,
@@ -60,7 +59,7 @@ fn handle_mouse_click(
 }
 
 fn move_on_mouse(
-    _cmd: Commands,
+    mut cmd: Commands,
     user_data: Res<UserData>,
     mut q_objs: Query<(&mut Transform, &GlobalTransform), With<Aabb>>,
     q_window: Query<&Window>,
@@ -70,26 +69,38 @@ fn move_on_mouse(
         return;
     };
 
+    // Get cursor position in space
     let window = q_window.single();
     let (camera, camera_global) = q_camera.single();
-    let (mut obj_transform, obj_global) = q_objs.get_mut(selected_ent).unwrap();
-
-    let cursor_3d = window
+    let Some(pointer_ray) = window
         .cursor_position()
         .and_then(|pos| camera.viewport_to_world(camera_global, pos))
-        .unwrap();
+    else {
+        cmd.trigger(UnlockObject::MouseExited);
+        return;
+    };
+
+    let (mut obj_transform, obj_global) = q_objs.get_mut(selected_ent).unwrap();
+
+    // Move the object in his plane
     let moving_plane = (
-        InfinitePlane3d::new(camera_global.right().cross(*camera_global.up())),
+        InfinitePlane3d::new(camera_global.right().cross(camera_global.up().into())),
         obj_global.translation(),
     );
     let target_pos_glob = {
-        let intersection_dist = cursor_3d
-            .intersect_plane(moving_plane.1, moving_plane.0)
-            .unwrap();
-        cursor_3d.get_point(intersection_dist)
+        let Some(intersection_dist) = pointer_ray.intersect_plane(moving_plane.1, moving_plane.0)
+        else {
+            cmd.trigger(UnlockObject::MovingPlaneIntersectionNotFound);
+            return;
+        };
+        pointer_ray.get_point(intersection_dist)
     };
-    let target_pos_local = obj_global.transform_point(target_pos_glob);
-    obj_transform.translation = target_pos_glob;
+    let pos_diff = target_pos_glob - obj_global.translation();
+    obj_transform.translation += pos_diff;
+}
+
+fn mouse_exited(_trigger: Trigger<UnlockObject>, mut user_data: ResMut<UserData>) {
+    user_data.selected_ent = None;
 }
 
 pub struct InteractionPlugin;
@@ -98,6 +109,7 @@ impl Plugin for InteractionPlugin {
         app.add_systems(Update, handle_mouse_click)
             .add_systems(Update, move_on_mouse)
             .insert_resource(UserData::default())
-            .observe(cast_ray);
+            .observe(cast_ray)
+            .observe(mouse_exited);
     }
 }

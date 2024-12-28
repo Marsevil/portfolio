@@ -9,3 +9,9 @@ pub struct UserData {
 pub struct CastRayEvent {
     pub ray: Ray3d,
 }
+
+#[derive(Debug, Event)]
+pub enum UnlockObject {
+    MouseExited,
+    MovingPlaneIntersectionNotFound,
+}
