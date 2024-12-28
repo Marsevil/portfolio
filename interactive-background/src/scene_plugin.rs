@@ -10,7 +10,8 @@ const CUBE_PATH: &str = "models/Portal Companion Cube.glb#Scene0";
 
 #[derive(Bundle)]
 pub struct EntityBundle {
-    pub scene: SceneBundle,
+    pub transform: Transform,
+    pub scene: SceneRoot,
     pub rotation: Rotation,
     pub aabb: Aabb,
     pub smooth: SmoothMove,
@@ -19,17 +20,14 @@ pub struct EntityBundle {
 fn scene_init(mut commands: Commands, asset_server: Res<AssetServer>) {
     let cube_model = asset_server.load(CUBE_PATH);
 
-    commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(0.0, 5.0, -15.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    });
+    commands.spawn((
+        Camera3d::default(),
+        Transform::from_xyz(0.0, 5.0, -15.0).looking_at(Vec3::ZERO, Vec3::Y),
+    ));
 
-    commands.spawn(DirectionalLightBundle {
-        directional_light: DirectionalLight {
-            shadows_enabled: false,
-            ..default()
-        },
-        ..default()
+    commands.spawn(DirectionalLight {
+        shadows_enabled: false,
+        ..Default::default()
     });
 
     let new_cube = |start_angle: f32, distance: f32| -> EntityBundle {
@@ -38,11 +36,8 @@ fn scene_init(mut commands: Commands, asset_server: Res<AssetServer>) {
             .with_rotation(rotation)
             .with_translation(rotation * Vec3::ZERO.with_z(distance));
         EntityBundle {
-            scene: SceneBundle {
-                scene: cube_model.clone(),
-                transform,
-                ..default()
-            },
+            scene: SceneRoot(cube_model.clone()),
+            transform,
             rotation: Rotation {
                 angle: 0.0,
                 angular_velocity: -1.0,
@@ -55,9 +50,7 @@ fn scene_init(mut commands: Commands, asset_server: Res<AssetServer>) {
                     max: Vec3::new(1.0, 1.0, 1.0).into(),
                 },
             },
-            smooth: SmoothMove {
-                target_transform: transform,
-            },
+            smooth: SmoothMove::default().with_target_transform(transform),
         }
     };
 

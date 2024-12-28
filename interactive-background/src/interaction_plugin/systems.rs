@@ -5,7 +5,9 @@ use bevy::math::bounding::{BoundingVolume, RayCast3d};
 use bevy::math::prelude::InfinitePlane3d;
 use bevy::prelude::*;
 
-use super::resources::{CastRayEvent, UnlockObject, UserData};
+use crate::smooth_moving_plugin::SmoothMove;
+
+use super::resources::{CastRayEvent, UnlockEntity, UserData};
 use super::Aabb;
 
 fn cast_ray(
@@ -33,12 +35,11 @@ fn cast_ray(
 fn handle_mouse_click(
     mut cmd: Commands,
     mouse_btn: Res<ButtonInput<MouseButton>>,
-    mut user_data: ResMut<UserData>,
     q_window: Query<&Window>,
     q_camera: Query<(&Camera, &GlobalTransform)>,
 ) {
     if mouse_btn.just_released(MouseButton::Left) {
-        user_data.selected_ent = None;
+        cmd.trigger(UnlockEntity::ClickReleased);
         return;
     }
     if !mouse_btn.just_pressed(MouseButton::Left) {
@@ -50,7 +51,7 @@ fn handle_mouse_click(
 
     let Some(ray) = window
         .cursor_position()
-        .and_then(|pos| camera.viewport_to_world(camera_transform, pos))
+        .and_then(|pos| camera.viewport_to_world(camera_transform, pos).ok())
     else {
         return;
     };
@@ -74,9 +75,9 @@ fn move_on_mouse(
     let (camera, camera_global) = q_camera.single();
     let Some(pointer_ray) = window
         .cursor_position()
-        .and_then(|pos| camera.viewport_to_world(camera_global, pos))
+        .and_then(|pos| camera.viewport_to_world(camera_global, pos).ok())
     else {
-        cmd.trigger(UnlockObject::MouseExited);
+        cmd.trigger(UnlockEntity::MouseExited);
         return;
     };
 
@@ -90,7 +91,7 @@ fn move_on_mouse(
     let target_pos_glob = {
         let Some(intersection_dist) = pointer_ray.intersect_plane(moving_plane.1, moving_plane.0)
         else {
-            cmd.trigger(UnlockObject::MovingPlaneIntersectionNotFound);
+            cmd.trigger(UnlockEntity::MovingPlaneIntersectionNotFound);
             return;
         };
         pointer_ray.get_point(intersection_dist)
@@ -99,7 +100,18 @@ fn move_on_mouse(
     obj_transform.translation += pos_diff;
 }
 
-fn mouse_exited(_trigger: Trigger<UnlockObject>, mut user_data: ResMut<UserData>) {
+fn unlock_entity(
+    _trigger: Trigger<UnlockEntity>,
+    mut q_entities: Query<&mut SmoothMove>,
+    mut user_data: ResMut<UserData>,
+) {
+    let Some(locked_entity) = user_data.selected_ent else {
+        return;
+    };
+
+    if let Ok(mut move_data) = q_entities.get_mut(locked_entity) {
+        move_data.reset();
+    }
     user_data.selected_ent = None;
 }
 
@@ -109,7 +121,7 @@ impl Plugin for InteractionPlugin {
         app.add_systems(Update, handle_mouse_click)
             .add_systems(Update, move_on_mouse)
             .insert_resource(UserData::default())
-            .observe(cast_ray)
-            .observe(mouse_exited);
+            .add_observer(cast_ray)
+            .add_observer(unlock_entity);
     }
 }

@@ -11,7 +11,8 @@ pub struct CastRayEvent {
 }
 
 #[derive(Debug, Event)]
-pub enum UnlockObject {
+pub enum UnlockEntity {
     MouseExited,
+    ClickReleased,
     MovingPlaneIntersectionNotFound,
 }
