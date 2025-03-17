@@ -17,18 +17,8 @@ pub struct EntityBundle {
     pub smooth: SmoothMove,
 }
 
-fn scene_init(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let cube_model = asset_server.load(CUBE_PATH);
-
-    commands.spawn((
-        Camera3d::default(),
-        Transform::from_xyz(0.0, 5.0, -15.0).looking_at(Vec3::ZERO, Vec3::Y),
-    ));
-
-    commands.spawn(DirectionalLight {
-        shadows_enabled: false,
-        ..Default::default()
-    });
+fn init_entities(mut commands: Commands, assets: Res<AssetServer>) {
+    let cube_model = assets.load(CUBE_PATH);
 
     let new_cube = |start_angle: f32, distance: f32| -> EntityBundle {
         let rotation = Quat::from_rotation_y(start_angle);
@@ -59,9 +49,27 @@ fn scene_init(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(new_cube(-PI / 2.0, 10.0));
 }
 
+fn init_light(mut cmd: Commands) {
+    cmd.spawn(DirectionalLight {
+        shadows_enabled: false,
+        ..Default::default()
+    });
+}
+
+fn init_camera(mut cmd: Commands) {
+    cmd.spawn((
+        Camera3d::default(),
+        Camera {
+            clear_color: ClearColorConfig::Custom(Color::srgb(0.0, 0.0, 0.0)),
+            ..Default::default()
+        },
+        Transform::from_xyz(0.0, 5.0, -15.0).looking_at(Vec3::ZERO, Vec3::Y),
+    ));
+}
+
 pub struct ScenePlugin;
 impl Plugin for ScenePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, scene_init);
+        app.add_systems(Startup, (init_camera, init_light, init_entities));
     }
 }
