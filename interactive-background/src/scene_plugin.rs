@@ -1,5 +1,11 @@
+use bevy::asset::RenderAssetUsages;
+use bevy::core_pipeline::Skybox;
 use bevy::math::bounding::Aabb3d;
 use bevy::prelude::*;
+use bevy::render::render_resource::{
+    Extent3d, TextureDimension, TextureFormat, TextureUsages, TextureViewDescriptor,
+    TextureViewDimension,
+};
 use core::f32::consts::PI;
 
 use crate::interaction_plugin::Aabb;
@@ -56,14 +62,38 @@ fn init_light(mut cmd: Commands) {
     });
 }
 
-fn init_camera(mut cmd: Commands) {
+fn init_camera(mut cmd: Commands, mut images: ResMut<Assets<Image>>) {
+    let size = Extent3d {
+        width: 512,
+        height: 6 * 512,
+        ..default()
+    };
+    let mut image = Image::new_fill(
+        size,
+        TextureDimension::D2,
+        &[90, 90, 255, 255],
+        TextureFormat::Rgba8UnormSrgb,
+        RenderAssetUsages::default(),
+    );
+    image.texture_descriptor.usage =
+        TextureUsages::TEXTURE_BINDING | TextureUsages::COPY_DST | TextureUsages::RENDER_ATTACHMENT;
+    image.reinterpret_stacked_2d_as_array(image.height() / image.width());
+    image.texture_view_descriptor = Some(TextureViewDescriptor {
+        dimension: Some(TextureViewDimension::Cube),
+        ..default()
+    });
+
+    let image_handle = images.add(image);
+
     cmd.spawn((
         Camera3d::default(),
-        Camera {
-            clear_color: ClearColorConfig::Custom(Color::srgb(0.0, 0.0, 0.0)),
+        Camera::default(),
+        Transform::from_xyz(0.0, 5.0, -15.0).looking_at(Vec3::ZERO, Vec3::Y),
+        Skybox {
+            image: image_handle,
+            brightness: 1000.0,
             ..Default::default()
         },
-        Transform::from_xyz(0.0, 5.0, -15.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 }
 
