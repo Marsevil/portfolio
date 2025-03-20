@@ -1,0 +1,21 @@
+<!doctype html>
+
+<html lang="en">
+
+<body style="margin: 0px">
+  <script type="module">
+    import init from './dist/interactive-background.js'
+
+    init().catch((err) => {
+      if (err.message.startsWith("Using exceptions for control flow")) {
+        return;
+      }
+
+      throw error;
+    });
+  </script>
+
+  <canvas id="interactive-background-renderer"></canvas>
+</body>
+
+</html>

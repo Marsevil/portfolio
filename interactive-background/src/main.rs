@@ -1,6 +1,7 @@
 mod interaction_plugin;
 mod rotation_plugin;
 mod scene_plugin;
+mod skybox_plugin;
 mod smooth_moving_plugin;
 
 use bevy::prelude::*;
@@ -8,6 +9,7 @@ use bevy::prelude::*;
 use crate::interaction_plugin::InteractionPlugin;
 use crate::rotation_plugin::RotationPlugin;
 use crate::scene_plugin::ScenePlugin;
+use crate::skybox_plugin::SkyboxPlugin;
 use crate::smooth_moving_plugin::SmoothMovingPlugin;
 
 fn main() {
@@ -26,6 +28,7 @@ fn main() {
             RotationPlugin,
             InteractionPlugin,
             SmoothMovingPlugin,
+            SkyboxPlugin,
         ))
         .run();
 }

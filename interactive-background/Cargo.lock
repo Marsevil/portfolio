@@ -2356,6 +2356,7 @@ name = "interactive-background"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "wgpu-types",
 ]
 
 [[package]]

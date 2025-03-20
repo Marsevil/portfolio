@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bevy = "0.15.3"
+bevy = { version = "0.15.3", features = ["webgl2"] }
+wgpu-types = "23.0.0"
 
 [profile.dev]
 opt-level = 1

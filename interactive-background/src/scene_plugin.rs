@@ -1,11 +1,19 @@
+use bevy::asset::RenderAssetUsages;
+use bevy::core_pipeline::Skybox;
 use bevy::math::bounding::Aabb3d;
 use bevy::prelude::*;
+use bevy::render::render_resource::{
+    Extent3d, TextureDimension, TextureFormat, TextureUsages, TextureViewDescriptor,
+    TextureViewDimension,
+};
 use core::f32::consts::PI;
 
 use crate::interaction_plugin::Aabb;
 use crate::rotation_plugin::Rotation;
+use crate::skybox_plugin::{SkyboxImage, SkyboxPipelineParameters};
 use crate::smooth_moving_plugin::SmoothMove;
 
+const NB_CUBE_FACES: u8 = 6;
 const CUBE_PATH: &str = "models/Portal Companion Cube.glb#Scene0";
 
 #[derive(Bundle)]
@@ -56,15 +64,42 @@ fn init_light(mut cmd: Commands) {
     });
 }
 
-fn init_camera(mut cmd: Commands) {
+fn init_camera(mut cmd: Commands, mut images: ResMut<Assets<Image>>) {
+    let size = Extent3d {
+        width: 512,
+        height: 6 * 512,
+        ..default()
+    };
+    let mut image = Image::new_fill(
+        size,
+        TextureDimension::D2,
+        &[90, 90, 255, 255],
+        TextureFormat::Rgba8Unorm,
+        RenderAssetUsages::default(),
+    );
+    image.texture_descriptor.usage =
+        TextureUsages::COPY_DST | TextureUsages::TEXTURE_BINDING | TextureUsages::RENDER_ATTACHMENT;
+    image.reinterpret_stacked_2d_as_array(NB_CUBE_FACES as u32);
+    image.texture_view_descriptor = Some(TextureViewDescriptor {
+        dimension: Some(TextureViewDimension::Cube),
+        ..default()
+    });
+
+    let image_handle = images.add(image);
+
     cmd.spawn((
         Camera3d::default(),
-        Camera {
-            clear_color: ClearColorConfig::Custom(Color::srgb(0.0, 0.0, 0.0)),
+        Camera::default(),
+        Transform::from_xyz(0.0, 5.0, -15.0).looking_at(Vec3::ZERO, Vec3::Y),
+        Skybox {
+            image: image_handle.clone(),
+            brightness: 1000.0,
             ..Default::default()
         },
-        Transform::from_xyz(0.0, 5.0, -15.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
+
+    cmd.insert_resource(SkyboxImage(image_handle));
+    cmd.insert_resource(SkyboxPipelineParameters::default());
 }
 
 pub struct ScenePlugin;
