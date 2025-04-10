@@ -10,7 +10,7 @@ use core::f32::consts::PI;
 
 use crate::interaction_plugin::Aabb;
 use crate::rotation_plugin::Rotation;
-use crate::skybox_plugin::{SkyboxImage, SkyboxPipelineParameters};
+use crate::skybox_plugin::SkyboxImage;
 use crate::smooth_moving_plugin::SmoothMove;
 
 const NB_CUBE_FACES: u8 = 6;
@@ -73,7 +73,7 @@ fn init_camera(mut cmd: Commands, mut images: ResMut<Assets<Image>>) {
     let mut image = Image::new_fill(
         size,
         TextureDimension::D2,
-        &[90, 90, 255, 255],
+        &[0, 0, 0, 255],
         TextureFormat::Rgba8Unorm,
         RenderAssetUsages::default(),
     );
@@ -99,7 +99,6 @@ fn init_camera(mut cmd: Commands, mut images: ResMut<Assets<Image>>) {
     ));
 
     cmd.insert_resource(SkyboxImage(image_handle));
-    cmd.insert_resource(SkyboxPipelineParameters::default());
 }
 
 pub struct ScenePlugin;
