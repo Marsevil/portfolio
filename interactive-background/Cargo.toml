@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 bevy = { version = "0.15.3", features = ["webgl2"] }
+noisy_bevy = "0.8.0"
 wgpu-types = "23.0.0"
 
 [profile.dev]

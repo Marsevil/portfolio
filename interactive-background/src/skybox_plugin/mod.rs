@@ -12,6 +12,7 @@ use bevy::{
         Render, RenderApp, RenderSet,
     },
 };
+use noisy_bevy::NoisyShaderPlugin;
 use wgpu_types::BufferUsages;
 
 #[derive(Clone, Deref, Resource, ExtractResource)]
@@ -57,6 +58,7 @@ struct SkyboxPipelineLabel;
 impl Plugin for SkyboxPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((
+            NoisyShaderPlugin,
             ExtractResourcePlugin::<SkyboxImage>::default(),
             ExtractResourcePlugin::<shader::Uniforms>::default(),
             ExtractResourcePlugin::<SkyboxPipelineUniformBuffers>::default(),

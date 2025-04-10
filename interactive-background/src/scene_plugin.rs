@@ -66,8 +66,8 @@ fn init_light(mut cmd: Commands) {
 
 fn init_camera(mut cmd: Commands, mut images: ResMut<Assets<Image>>) {
     let size = Extent3d {
-        width: 512,
-        height: 6 * 512,
+        width: 1024,
+        height: 6 * 1024,
         ..default()
     };
     let mut image = Image::new_fill(
