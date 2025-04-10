@@ -29,7 +29,7 @@ fn init_resources(mut cmd: Commands) {
 }
 
 fn update_uniforms(mut uniforms: ResMut<shader::Uniforms>, time: Res<Time>) {
-    uniforms.time += time.elapsed_secs();
+    uniforms.time = time.elapsed_secs();
 }
 
 fn init_uniform_buffers(mut cmd: Commands, render_device: Res<RenderDevice>) {

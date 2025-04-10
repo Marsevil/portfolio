@@ -17,7 +17,7 @@ fn fact(x: f32) -> f32 {
 
 @fragment
 fn init(in: FullscreenVertexOutput) -> @location(0) vec4<f32> {
-    let fact = fact(uniforms.time * 0.1);
+    let fact = fact(uniforms.time);
     let color = fact * vec3<f32>(1.0, 0.0, 0.0) + (1 - fact) * vec3<f32>(0.0, 0.0, 1.0);
     return vec4<f32>(color, 1.0);
 }
