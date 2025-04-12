@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use core::f32;
 use core::f32::consts::PI;
 
 use crate::interaction_plugin::resources::UserData;
@@ -17,6 +18,15 @@ pub fn update_angles(mut _commands: Commands, mut query: Query<&mut Rotation>, t
     }
 }
 
+// TODO: Move this function as a method of `Rotation`
+pub fn transform_from_angle(angle: f32, distance: f32) -> Transform {
+    Transform::from_rotation(Quat::from_euler(
+        EulerRot::ZYX,
+        f32::consts::FRAC_PI_8,
+        angle,
+        0.0,
+    )) * Transform::from_xyz(0.0, 0.0, distance)
+}
 pub fn update_transforms(
     mut _commands: Commands,
     user_data: Res<UserData>,
@@ -31,9 +41,7 @@ pub fn update_transforms(
         }
 
         let angle = rotation.angle + rotation.start_angle;
-        let new_transform =
-            Transform::from_rotation(Quat::from_euler(EulerRot::YZX, angle, 0.0, 0.0))
-                * Transform::from_xyz(0.0, 0.0, rotation.distance);
+        let new_transform = transform_from_angle(angle, rotation.distance);
 
         smooth.target_transform = new_transform;
     }

@@ -1,0 +1,35 @@
+[tasks.build]
+command = "cargo"
+args = ["build"]
+
+[tasks.wasm]
+command = "wasm-bindgen"
+args = [
+  "--target", "web",
+  "--out-dir", "dist",
+  "./target/wasm32-unknown-unknown/debug/interactive-background.wasm"
+]
+
+[tasks.dbg]
+dependencies = [
+  "build",
+  "wasm",
+]
+
+[tasks.buildrel]
+command = "cargo"
+args = ["build", "--release"]
+
+[tasks.wasmrel]
+command = "wasm-bindgen"
+args = [
+  "--target", "web",
+  "--out-dir", "dist",
+  "./target/wasm32-unknown-unknown/debug/interactive-background.wasm"
+]
+
+[tasks.rel]
+dependencies = [
+  "buildrel",
+  "wasmrel",
+]

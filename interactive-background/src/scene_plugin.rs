@@ -1,3 +1,5 @@
+use core::f32;
+
 use bevy::asset::RenderAssetUsages;
 use bevy::core_pipeline::Skybox;
 use bevy::math::bounding::Aabb3d;
@@ -6,15 +8,22 @@ use bevy::render::render_resource::{
     Extent3d, TextureDimension, TextureFormat, TextureUsages, TextureViewDescriptor,
     TextureViewDimension,
 };
-use core::f32::consts::PI;
 
 use crate::interaction_plugin::Aabb;
-use crate::rotation_plugin::Rotation;
+use crate::rotation_plugin::{transform_from_angle, Rotation};
 use crate::skybox_plugin::SkyboxImage;
 use crate::smooth_moving_plugin::SmoothMove;
 
 const NB_CUBE_FACES: u8 = 6;
-const CUBE_PATH: &str = "models/Portal Companion Cube.glb#Scene0";
+const ENTITIES_PATHS: [&str; 7] = [
+    "models/Portal Companion Cube.glb#Scene0",
+    "models/Guitar Amp.glb#Scene0",
+    "models/Electric guitar.glb#Scene0",
+    "models/Mushroom.glb#Scene0",
+    "models/Oculus Controller.glb#Scene0",
+    "models/Tree.glb#Scene0",
+    "models/Videogame Controller.glb#Scene0",
+];
 
 #[derive(Bundle)]
 pub struct EntityBundle {
@@ -25,36 +34,34 @@ pub struct EntityBundle {
     pub smooth: SmoothMove,
 }
 
+fn new_entity(model: Handle<Scene>, angle: f32, distance: f32) -> EntityBundle {
+    let transform = transform_from_angle(angle, distance);
+    EntityBundle {
+        scene: SceneRoot(model),
+        transform,
+        rotation: Rotation {
+            angle: 0.0,
+            angular_velocity: -1.0,
+            start_angle: angle,
+            distance,
+        },
+        aabb: Aabb {
+            aabb: Aabb3d {
+                min: Vec3::new(-1.0, -1.0, -1.0).into(),
+                max: Vec3::new(1.0, 1.0, 1.0).into(),
+            },
+        },
+        smooth: SmoothMove::default().with_target_transform(transform),
+    }
+}
 fn init_entities(mut commands: Commands, assets: Res<AssetServer>) {
-    let cube_model = assets.load(CUBE_PATH);
-
-    let new_cube = |start_angle: f32, distance: f32| -> EntityBundle {
-        let rotation = Quat::from_rotation_y(start_angle);
-        let transform = Transform::default()
-            .with_rotation(rotation)
-            .with_translation(rotation * Vec3::ZERO.with_z(distance));
-        EntityBundle {
-            scene: SceneRoot(cube_model.clone()),
-            transform,
-            rotation: Rotation {
-                angle: 0.0,
-                angular_velocity: -1.0,
-                start_angle,
-                distance,
-            },
-            aabb: Aabb {
-                aabb: Aabb3d {
-                    min: Vec3::new(-1.0, -1.0, -1.0).into(),
-                    max: Vec3::new(1.0, 1.0, 1.0).into(),
-                },
-            },
-            smooth: SmoothMove::default().with_target_transform(transform),
-        }
-    };
-
-    commands.spawn(new_cube(0.0, 0.0));
-    commands.spawn(new_cube(PI / 2.0, 10.0));
-    commands.spawn(new_cube(-PI / 2.0, 10.0));
+    let angle_gap = 2.0 * core::f32::consts::PI / (ENTITIES_PATHS.len() as f32);
+    for (model_idx, model_path) in ENTITIES_PATHS.iter().enumerate() {
+        let model = assets.load(*model_path);
+        let angle = angle_gap * (model_idx as f32);
+        let scene = new_entity(model, angle, 10.0);
+        commands.spawn(scene);
+    }
 }
 
 fn init_light(mut cmd: Commands) {
@@ -90,7 +97,7 @@ fn init_camera(mut cmd: Commands, mut images: ResMut<Assets<Image>>) {
     cmd.spawn((
         Camera3d::default(),
         Camera::default(),
-        Transform::from_xyz(0.0, 5.0, -15.0).looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_xyz(0.0, 5.0, -20.0).looking_at(Vec3::ZERO, Vec3::Y),
         Skybox {
             image: image_handle.clone(),
             brightness: 1000.0,
