@@ -1,21 +1,34 @@
 <!doctype html>
 
 <html lang="en">
+  <body style="margin: 0px">
+    <script type="module">
+      import init, { run } from "./dist/interactive_background.js";
 
-<body style="margin: 0px">
-  <script type="module">
-    import init from './dist/interactive-background.js'
+      const onAppLoaded = () => {
+        const loadingText = document.getElementById("loading-text");
+        const canvas = document.getElementById(
+          "interactive-background-renderer",
+        );
 
-    init().catch((err) => {
-      if (err.message.startsWith("Using exceptions for control flow")) {
-        return;
-      }
+        loadingText.style.display = "none";
+        canvas.style.display = "block";
+      };
 
-      throw error;
-    });
-  </script>
+      init()
+        .then(() => {
+          run(onAppLoaded);
+        })
+        .catch((err) => {
+          if (err.message.startsWith("Using exceptions for control flow")) {
+            return;
+          }
 
-  <canvas id="interactive-background-renderer"></canvas>
-</body>
+          throw err;
+        });
+    </script>
 
+    <p id="loading-text">Canvas loading</p>
+    <canvas style="display: none" id="interactive-background-renderer"></canvas>
+  </body>
 </html>

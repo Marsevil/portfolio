@@ -10,6 +10,7 @@ use bevy::render::render_resource::{
 };
 
 use crate::interaction_plugin::Aabb;
+use crate::loading_plugin::LoadingState;
 use crate::rotation_plugin::{transform_from_angle, Rotation};
 use crate::skybox_plugin::SkyboxImage;
 use crate::smooth_moving_plugin::SmoothMove;
@@ -54,10 +55,15 @@ fn new_entity(model: Handle<Scene>, angle: f32, distance: f32) -> EntityBundle {
         smooth: SmoothMove::default().with_target_transform(transform),
     }
 }
-fn init_entities(mut commands: Commands, assets: Res<AssetServer>) {
+fn init_entities(
+    mut commands: Commands,
+    mut loading_state: ResMut<LoadingState>,
+    assets: Res<AssetServer>,
+) {
     let angle_gap = 2.0 * core::f32::consts::PI / (ENTITIES_PATHS.len() as f32);
     for (model_idx, model_path) in ENTITIES_PATHS.iter().enumerate() {
         let model = assets.load(*model_path);
+        loading_state.loading_assets.push(model.clone().into());
         let angle = angle_gap * (model_idx as f32);
         let scene = new_entity(model, angle, 10.0);
         commands.spawn(scene);

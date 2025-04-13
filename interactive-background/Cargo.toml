@@ -3,10 +3,16 @@ name = "interactive-background"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+crate-type = ["cdylib"]
+
 [dependencies]
 bevy = { version = "0.15.3", features = ["webgl2"] }
+console_error_panic_hook = "0.1.7"
 noisy_bevy = "0.8.0"
 wgpu-types = "23.0.0"
+js-sys = "0.3.77"
+wasm-bindgen = "0.2.100"
 
 [profile.dev]
 opt-level = 1
