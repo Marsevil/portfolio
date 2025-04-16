@@ -15,16 +15,17 @@
 </script>
 
 <div id="banner">
-	<Title {name} {title} />
 	<Background bind:loadingState={backgroundLoadingState} />
-	{#if backgroundLoadingState !== 'loaded'}
+	{#if backgroundLoadingState === 'loaded'}
+		<Title {name} {title} />
+		<div class="absolute bottom-0 right-0">
+			<Dialog position="right">{interactDialogText}</Dialog>
+		</div>
+	{:else}
 		<div class="pointer-events-none absolute flex inset-0 -top-[400px] items-center justify-center">
 			<div class="loading loading-spinner loading-lg"></div>
 		</div>
 	{/if}
-	<div class="absolute bottom-0 right-0">
-		<Dialog position="right">{interactDialogText}</Dialog>
-	</div>
 </div>
 
 <style>

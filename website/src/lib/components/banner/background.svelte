@@ -1,8 +1,10 @@
 <script lang="ts">
-	import init from '@interactive-background/interactive-background';
+	import init, { run } from '@interactive-background/interactive_background';
 	import { onMount } from 'svelte';
 
 	import { type LoadingState } from '$lib/models/enums';
+
+	const CANVAS_ID: string = 'interactive-background-renderer';
 
 	type Props = {
 		loadingState?: LoadingState;
@@ -10,10 +12,16 @@
 	let { loadingState = $bindable('isLoading') }: Props = $props();
 
 	let canvas: HTMLCanvasElement;
+	let canvasHidden = $derived(loadingState !== 'loaded');
 
 	function _resizeCanvas() {
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
+	}
+
+	function onBackgroundLoaded() {
+		loadingState = 'loaded';
+		console.log('background app loaded');
 	}
 
 	onMount(() => {
@@ -22,23 +30,28 @@
 		_resizeCanvas();
 
 		init()
+			.then(() => {
+				run(CANVAS_ID, onBackgroundLoaded);
+			})
 			.catch((err) => {
 				loadingState = 'failed';
 				console.error(err);
-			})
-			.then(() => {
-				loadingState = 'loaded';
-				console.log('background interactive started...');
 			});
 	});
 </script>
 
-<canvas bind:this={canvas} id="interactive-background-renderer" width={32} height={32}></canvas>
+<canvas class:canvasHidden bind:this={canvas} id={CANVAS_ID} width={32} height={32}></canvas>
 
 <style>
 	canvas {
 		width: 100%;
 		height: 100%;
 		background-color: black;
+		transition: all ease-in-out 1s;
+		opacity: 1;
+	}
+
+	canvas.canvasHidden {
+		opacity: 0;
 	}
 </style>

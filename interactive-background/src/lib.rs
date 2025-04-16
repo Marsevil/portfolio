@@ -33,10 +33,10 @@ fn loading_finished(_event: Trigger<LoadingJustFinished>, interop: NonSend<JsInt
 
 #[wasm_bindgen(typescript_custom_section)]
 const RUN_FUNCTION_DEF: &str = r#"
-export function run(onLoadingFinished: () => void)
+export function run(canvas_id: string, onLoadingFinished: () => void)
 "#;
 #[wasm_bindgen(skip_typescript)]
-pub fn run(on_loading_finished: &JsFunc) {
+pub fn run(canvas_id: &str, on_loading_finished: &JsFunc) {
     panic::set_hook(Box::new(console_error_panic_hook::hook));
 
     let loaded_cb = if on_loading_finished.is_function() {
@@ -53,7 +53,7 @@ pub fn run(on_loading_finished: &JsFunc) {
             ScenePlugin,
             DefaultPlugins.set(WindowPlugin {
                 primary_window: Some(Window {
-                    canvas: Some("#interactive-background-renderer".into()),
+                    canvas: Some(format!("#{canvas_id}")),
                     fit_canvas_to_parent: true,
                     prevent_default_event_handling: false,
                     ..default()
