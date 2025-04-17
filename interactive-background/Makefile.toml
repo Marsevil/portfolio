@@ -1,3 +1,17 @@
+[tasks.cargo-clean]
+command = "cargo"
+args = ["clean"]
+
+[tasks.dist-clean]
+command = "rm"
+args = ["-r", "./dist"]
+
+[tasks.clean]
+dependencies = [
+  "cargo-clean",
+  "dist-clean"
+]
+
 [tasks.buildwasm]
 command = "cargo"
 args = ["build"]

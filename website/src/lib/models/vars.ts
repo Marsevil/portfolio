@@ -9,6 +9,8 @@ export type Titles = {
 
 export type Banner = {
 	interactDialog: string;
+	loadingFailedText: string;
+	loadingText: string;
 };
 
 export type ProjectCard = {

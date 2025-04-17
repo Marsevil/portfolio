@@ -4,10 +4,11 @@
 	import type { Vars } from '$lib/models';
 
 	type Props = {
+		severity?: 'info' | 'warning';
 		position: 'left' | 'right';
 		children?: Snippet;
 	};
-	let { position, children }: Props = $props();
+	let { severity = 'info', position, children }: Props = $props();
 
 	let closed = $state(false);
 
@@ -20,6 +21,14 @@
 				return 'chat-end';
 		}
 	})();
+	const chatBubbleClass: 'chat-bubble-warning' | 'chat-bubble-info' = (() => {
+		switch (severity) {
+			case 'info':
+				return 'chat-bubble-info';
+			case 'warning':
+				return 'chat-bubble-warning';
+		}
+	})();
 
 	function closeDialog() {
 		closed = true;
@@ -28,7 +37,7 @@
 
 {#if !closed}
 	<div class="chat {dialogSideClass}">
-		<div class="chat-bubble chat-bubble-info">
+		<div class="chat-bubble {chatBubbleClass}">
 			{@render children?.()}
 
 			<button class="btn" onclick={closeDialog}>{closeText}</button>

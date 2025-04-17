@@ -4,6 +4,7 @@
 
 	import { type LoadingState } from '$lib/models/enums';
 
+	const TIMEOUT_MS: number = 5000;
 	const CANVAS_ID: string = 'interactive-background-renderer';
 
 	type Props = {
@@ -21,7 +22,6 @@
 
 	function onBackgroundLoaded() {
 		loadingState = 'loaded';
-		console.log('background app loaded');
 	}
 
 	onMount(() => {
@@ -29,14 +29,17 @@
 		window.addEventListener('resize', _resizeCanvas, false);
 		_resizeCanvas();
 
-		init()
-			.then(() => {
-				run(CANVAS_ID, onBackgroundLoaded);
-			})
-			.catch((err) => {
-				loadingState = 'failed';
-				console.error(err);
-			});
+		Promise.race([
+			init().then(() => run(CANVAS_ID, onBackgroundLoaded)),
+			new Promise((_, reject) => setTimeout(() => reject(new Error('App timeout')), TIMEOUT_MS))
+		]).catch((err: any) => {
+			if (err instanceof Error && err.message.startsWith('Using exceptions for control flow')) {
+				return;
+			}
+
+			loadingState = 'failed';
+			console.error(err);
+		});
 	});
 </script>
 
