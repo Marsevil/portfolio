@@ -42,8 +42,17 @@ args = [
   "./target/wasm32-unknown-unknown/release/interactive_background.wasm"
 ]
 
+[tasks.opt]
+command = "wasm-opt"
+args = [
+  "-O",
+  "-o", "dist/interactive_background_bg.wasm",
+  "dist/interactive_background_bg.wasm",
+]
+
 [tasks.build-rel]
 dependencies = [
   "buildwasm-rel",
   "bindgen-rel",
+  "opt",
 ]
