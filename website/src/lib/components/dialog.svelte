@@ -4,7 +4,7 @@
 	import type { Vars } from '$lib/models';
 
 	type Props = {
-		severity?: 'info' | 'warning';
+		severity?: 'info' | 'warning' | 'error';
 		position: 'left' | 'right';
 		children?: Snippet;
 	};
@@ -21,12 +21,14 @@
 				return 'chat-end';
 		}
 	})();
-	const chatBubbleClass: 'chat-bubble-warning' | 'chat-bubble-info' = (() => {
+	const chatBubbleClass: 'chat-bubble-warning' | 'chat-bubble-info' | 'chat-bubble-error' = (() => {
 		switch (severity) {
 			case 'info':
 				return 'chat-bubble-info';
 			case 'warning':
 				return 'chat-bubble-warning';
+			case 'error':
+				return 'chat-bubble-error';
 		}
 	})();
 

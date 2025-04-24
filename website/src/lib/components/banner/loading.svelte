@@ -2,7 +2,7 @@
 	import { type Vars } from '$lib/models';
 	import { getContext } from 'svelte';
 
-	const { loadingText } = getContext<Vars>('vars').banner;
+	const { loading: loadingText } = getContext<Vars>('vars').banner;
 </script>
 
 <div class="pointer-events-none absolute flex inset-0 items-center justify-center">
