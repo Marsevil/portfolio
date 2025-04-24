@@ -29,17 +29,26 @@
 		window.addEventListener('resize', _resizeCanvas, false);
 		_resizeCanvas();
 
-		Promise.race([
-			init().then(() => run(CANVAS_ID, onBackgroundLoaded)),
-			new Promise((_, reject) => setTimeout(() => reject(new Error('App timeout')), TIMEOUT_MS))
-		]).catch((err: any) => {
-			if (err instanceof Error && err.message.startsWith('Using exceptions for control flow')) {
+		// Init wasm library and run the background app
+		init()
+			.then(() => run(CANVAS_ID, onBackgroundLoaded))
+			.catch((err) => {
+				if (err instanceof Error && err.message.startsWith('Using exceptions for control flow')) {
+					return;
+				}
+
+				loadingState = 'failed';
+				console.error(err);
+			});
+
+		// Timeout if the app is not loaded after some times
+		setTimeout(() => {
+			if (loadingState === 'loaded') {
 				return;
 			}
 
 			loadingState = 'failed';
-			console.error(err);
-		});
+		}, TIMEOUT_MS);
 	});
 </script>
 
