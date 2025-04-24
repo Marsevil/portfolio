@@ -7,7 +7,7 @@
 </script>
 
 <div id="root">
-	<h2 class="text-accent">{@render children?.()}</h2>
+	<h2>{@render children?.()}</h2>
 	<div class="divider"></div>
 </div>
 

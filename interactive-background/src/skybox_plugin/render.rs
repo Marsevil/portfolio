@@ -127,6 +127,7 @@ impl render_graph::Node for SkyboxPipelineNode {
             let view = image.texture.create_view(&TextureViewDescriptor {
                 base_array_layer: face_idx,
                 array_layer_count: Some(1),
+                dimension: Some(wgpu_types::TextureViewDimension::D2),
                 ..Default::default()
             });
 

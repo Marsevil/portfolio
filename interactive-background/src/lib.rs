@@ -51,15 +51,20 @@ pub fn run(canvas_id: &str, on_loading_finished: &JsFunc) {
         .add_observer(loading_finished)
         .add_plugins((
             ScenePlugin,
-            DefaultPlugins.set(WindowPlugin {
-                primary_window: Some(Window {
-                    canvas: Some(format!("#{canvas_id}")),
-                    fit_canvas_to_parent: true,
-                    prevent_default_event_handling: false,
+            DefaultPlugins
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        canvas: Some(format!("#{canvas_id}")),
+                        fit_canvas_to_parent: true,
+                        prevent_default_event_handling: false,
+                        ..default()
+                    }),
+                    ..default()
+                })
+                .set(AssetPlugin {
+                    meta_check: bevy::asset::AssetMetaCheck::Never,
                     ..default()
                 }),
-                ..default()
-            }),
             LoadingPlugin,
             RotationPlugin,
             InteractionPlugin,

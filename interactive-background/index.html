@@ -7,9 +7,7 @@
 
       const onAppLoaded = () => {
         const loadingText = document.getElementById("loading-text");
-        const canvas = document.getElementById(
-          "interactive-background-renderer",
-        );
+        const canvas = document.getElementById("renderer");
 
         loadingText.style.display = "none";
         canvas.style.display = "block";
@@ -17,7 +15,7 @@
 
       init()
         .then(() => {
-          run(onAppLoaded);
+          run("renderer", onAppLoaded);
         })
         .catch((err) => {
           if (err.message.startsWith("Using exceptions for control flow")) {
@@ -29,6 +27,6 @@
     </script>
 
     <p id="loading-text">Canvas loading</p>
-    <canvas style="display: none" id="interactive-background-renderer"></canvas>
+    <canvas style="display: none" id="renderer"></canvas>
   </body>
 </html>

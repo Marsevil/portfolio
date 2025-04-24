@@ -3,13 +3,13 @@
 
 	import type { Vars, Content } from '$lib/models';
 
-	const { rightReserved }: Vars = getContext('vars');
+	const { rightReserved } = getContext<Vars>('vars');
 	const {
 		personal: { name }
-	}: Content = getContext('content');
+	} = getContext<Content>('content');
 </script>
 
-<footer class="footer p-4 bg-neutral text-neutral-content items-center">
+<footer class="footer p-4 bg-base-300 items-center">
 	<p>Copyright © {new Date().getFullYear()} - {name} - {rightReserved}</p>
 	<nav class="grid-flow-col gap-4 items-center justify-self-end">
 		<a href="https://github.com/Marsevil" target="_blank">

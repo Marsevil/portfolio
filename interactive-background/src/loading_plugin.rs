@@ -21,7 +21,7 @@ impl LoadingState {
     /// Return if the loading is finished
     pub fn finished(&self) -> bool {
         self.loading_assets.is_empty()
-            & (self.confirmation_frames_count == Self::CONFIRMATION_FRAMES_TARGET)
+            & (self.confirmation_frames_count >= Self::CONFIRMATION_FRAMES_TARGET)
     }
 
     /// Returns if the loading has finished last frame

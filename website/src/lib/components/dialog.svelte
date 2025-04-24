@@ -13,6 +13,7 @@
 	let closed = $state(false);
 
 	const { close: closeText } = getContext<Vars>('vars').dialogBox;
+
 	const dialogSideClass: 'chat-start' | 'chat-end' = (() => {
 		switch (position) {
 			case 'left':
@@ -21,7 +22,7 @@
 				return 'chat-end';
 		}
 	})();
-	const chatBubbleClass: 'chat-bubble-warning' | 'chat-bubble-info' | 'chat-bubble-error' = (() => {
+	const chatBubbleClass: string = (() => {
 		switch (severity) {
 			case 'info':
 				return 'chat-bubble-info';

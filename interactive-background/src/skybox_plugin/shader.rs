@@ -12,6 +12,7 @@ pub const SHADER_PATH: &str = "skybox.wgsl";
 pub const FRAGMENT_ENTRY_POINT: &str = "init";
 
 #[derive(Default, Debug, Clone, Resource, ExtractResource, ShaderType)]
+#[repr(C)]
 pub struct Uniforms {
     pub time: f32,
     _webgl2_padding: Vec3,

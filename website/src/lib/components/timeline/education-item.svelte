@@ -1,23 +1,23 @@
 <script lang="ts">
 	import { type EducationEntry } from '$lib/models/content';
 
-	import TimelineItem from './timeline-item.svelte';
+	import TimelineItem, { type Props as BaseProps } from './timeline-item.svelte';
 
-	interface Props {
+	export type Props = {
 		entry: EducationEntry;
-		side: 'left' | 'right';
-		place: 'first' | 'last' | 'middle';
-	}
+		side: BaseProps['side'];
+		place: BaseProps['place'];
+	};
 
 	let { entry, side, place }: Props = $props();
 </script>
 
-<TimelineItem {side} {place} color="primary">
+<TimelineItem {side} {place} borderColorClass="border-education" pointColorClass="text-education">
 	{#snippet time()}
 		{entry.period[0].toLocaleString('fr', { year: 'numeric' })} &rarr; {entry.period[1].toLocaleString(
-				'fr',
-				{ year: 'numeric' }
-			)}
+			'fr',
+			{ year: 'numeric' }
+		)}
 	{/snippet}
 	{#snippet title()}
 		{entry.title}
@@ -26,8 +26,6 @@
 		{entry.institution} - {entry.location}
 	{/snippet}
 	{#snippet content()}
-	
-			{entry.comment ?? ''}
-		
+		{entry.comment ?? ''}
 	{/snippet}
 </TimelineItem>
