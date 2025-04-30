@@ -2,6 +2,13 @@ export type PersonalInfos = {
 	name: string;
 	title: string;
 	description: string;
+
+	links: {
+		linkedin?: string;
+		github?: string;
+		gitlab?: string;
+		escapegamefr?: string;
+	};
 };
 
 export type LanguageEntry = {
