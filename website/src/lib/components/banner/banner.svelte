@@ -17,7 +17,7 @@
 		getContext<Vars>('vars').banner;
 </script>
 
-<div id="banner" class="w-screen h-screen">
+<div id="banner" class="w-full h-screen">
 	<Background bind:loadingState={backgroundLoadingState} />
 	{#if backgroundLoadingState !== 'isLoading'}
 		<Title {name} {title} />

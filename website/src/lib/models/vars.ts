@@ -14,7 +14,6 @@ export type Banner = {
 };
 
 export type ProjectCard = {
-	sourceLink: string;
 	stateTag: {
 		done: string;
 		wip: string;
